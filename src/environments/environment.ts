@@ -3,7 +3,19 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  utiq: {
+    "idConnect": {
+      "baseUrl": "https://utiq.brand-demo.com/op/idconnect",
+      "usageType": "tmi",
+      "allowedUseCases": [
+        "mspProxy",
+        "saml",
+        "stub",
+        "token"
+      ]
+    }
+  }
 };
 
 /*
