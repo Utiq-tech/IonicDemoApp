@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton } from '@ionic/angular/standalone';
 import { environment } from 'src/environments/environment';
 import { UTIQ, SdkInitializerParams, SdkOptions } from 'utiq-tech';
 
@@ -8,7 +8,7 @@ import { UTIQ, SdkInitializerParams, SdkOptions } from 'utiq-tech';
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton],
 })
 export class HomePage {
   constructor() {
@@ -40,9 +40,8 @@ export class HomePage {
     };
   }
 
-  async initialize() {
-    const config = { sdkToken: 'R&Ai^v>TfqCz4Y^HH2?3uk8j', configParams: '', sdkOptions: { enableLogging: true } };
-    await UTIQ.initialize(config);
+  async startService() {
+    await UTIQ.startService({ stubToken: '523393b9b7aa92a534db512af83084506d89e965b95c36f982200e76afcb82cb' });
   }
 
 
