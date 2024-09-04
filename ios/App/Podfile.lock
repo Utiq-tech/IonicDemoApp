@@ -11,7 +11,7 @@ PODS:
   - CapacitorStatusBar (6.0.0):
     - Capacitor
   - UTIQ (0.1.45)
-  - UtiqTech (0.0.2):
+  - UtiqTech (0.0.3):
     - Capacitor
     - UTIQ
 
@@ -52,7 +52,7 @@ SPEC CHECKSUMS:
   CapacitorKeyboard: 5f32a712adf41e07a61caafb82cf29fb6d8ba123
   CapacitorStatusBar: 2e4369f99166125435641b1908d05f561eaba6f6
   UTIQ: 76e8ccc86db78c8920d196d0cf68e75f6d37ced3
-  UtiqTech: 445431cc4f8fc295eb31e819665ba5646d075699
+  UtiqTech: f03c5774f492399a7ab6c9b18100bd3b431fbba5
 
 PODFILE CHECKSUM: 28ba40937665d19fd4fbe4d1aed121f50c5517d8
 

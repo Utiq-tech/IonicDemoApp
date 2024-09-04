@@ -1,65 +1,62 @@
-import { Component } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonItem, IonLabel, IonList, ToastController, Platform, isPlatform } from '@ionic/angular/standalone';
+import { ChangeDetectorRef, Component } from '@angular/core';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonItem, IonLabel, IonList, ToastController, Platform, IonSpinner } from '@ionic/angular/standalone';
 import { UTIQ } from 'utiq-tech';
 import { environment } from '../../environments/environment';
+import { CommonModule } from '@angular/common';
+import { addIcons } from "ionicons";
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonLabel, IonList, IonItem],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonLabel, IonList, IonItem, IonSpinner, CommonModule],
 })
 export class HomePage {
 
   mtid: any;
   atid: any;
-  isMovil: boolean = false;
+  isLoading: boolean = false;
+  isMovil: boolean = true;
+  isIntialized: boolean = false;
+  stubToken: string = "523393b9b7aa92a534db512af83084506d89e965b95c36f982200e76afcb82cb";
 
-  constructor(private toastController: ToastController, private platform: Platform) {
+  constructor(private toastController: ToastController, private platform: Platform, private cdr: ChangeDetectorRef) {
     this.isMovil = platform.is('android') || platform.is('ios');
 
-    //utiq-web-sdk actions definition
-    window.Utiq ||= {};
-    window.Utiq.config ||= {};
-    window.Utiq.config.customUtiqHost = `https://utiq-test.utest1.work`
-    window.Utiq.config.listeners = {
-      onFlowCompleted: (value: { status: string }) => {
-        console.log(`onFlowCompleted -> status: ` + value.status);
-      },
-      onConsentUpdateFinished: (value: { isConsentGranted: boolean }) => {
-        console.log(`onConsentUpdateFinished -> isConsentGranted: ` + value.isConsentGranted);
-      },
-      onEligibilityChecked: (value: { isEligible: string }) => {
-        console.log(`onEligibilityChecked -> isEligible: ` + value.isEligible);
-      },
-      onInitialised: () => console.log(`onInitialised`),
-      onConsentManagerStatusChanged: (value: { status: string }) => {
-        console.log(`onConsentManagerStatusChanged -> status: ` + value.status);
-      },
-      onIdsAvailable: (value: { mtid: string, atid: string }) => {
-        this.mtid = value.mtid;
-        this.atid = value.atid;
-        document.getElementById('btnRefresh')?.click();
-        console.log(`onIdsAvailable -> mtid: ` + value.mtid + ` , atid: ` + value.atid);
-      }
-    };
-
-    //utiq-mobil-sdk actions definition
-    UTIQ.addListener('toast', (info: any) => {
-      this.presentToast('' + Object.values(info));
+    UTIQ.addListener('onFlowCompleted', (info: any) => {
+      this.isLoading = false;
+      console.log(`onFlowCompleted -> status: ` + Object.values(info)[0]);
     });
-    UTIQ.addListener('updateIds', (info: any) => {
+    UTIQ.addListener('onConsentUpdateFinished', (info: any) => {
+      console.log(`onConsentUpdateFinished -> isConsentGranted: ` + Object.values(info)[0]);
+    });
+    UTIQ.addListener('onEligibilityChecked', (info: any) => {
+      console.log(`onEligibilityChecked -> isEligible: ` + Object.values(info)[0]);
+    });
+    UTIQ.addListener('onInitialised', () => {
+      this.isIntialized = true;
+      this.presentToast('Success Initialization.');
+      console.log(`onInitialised`);
+    });
+    UTIQ.addListener('onConsentManagerStatusChanged', (info: any) => {
+      console.log(`onConsentManagerStatusChanged -> status: ` + Object.values(info)[0]);
+    });
+    UTIQ.addListener('onIdsAvailable', (info: any) => {
       this.atid = Object.values(info)[0];
       this.mtid = Object.values(info)[1];
-      document.getElementById('btnRefresh')?.click();
-      this.presentToast('Success');
+      console.log(`onIdsAvailable -> mtid: ` + this.mtid + ` , atid: ` + this.atid);
+      this.isLoading = false;
+      this.presentToast('Success fetching IDs.');
+      this.cdr.detectChanges();
     });
   };
 
   async initialize() {
-    const config = { sdkToken: 'R&Ai^v>TfqCz4Y^HH2?3uk8j', configParams: JSON.stringify(environment.utiq), sdkOptions: { enableLogging: true } };
-    await UTIQ.initialize(config);
+    if(!this.isIntialized){
+      const config = { sdkToken: 'R&Ai^v>TfqCz4Y^HH2?3uk8j', configParams: JSON.stringify(environment.utiq), sdkOptions: { enableLogging: true } };
+      UTIQ.initialize(config);
+    }
   }
   async acceptConsent() {
     await UTIQ.acceptConsent();
@@ -67,11 +64,13 @@ export class HomePage {
   async rejectConsent() {
     await UTIQ.rejectConsent();
   }
-  async startService(stubToken: string) {
-    await UTIQ.startService({ stubToken: stubToken });
+  async startService() {
+    if(this.mtid == null){
+      this.isLoading = true;
+      UTIQ.startService({ stubToken: this.stubToken });
+    }
   }
   async presentToast(text: string) {
-    console.log('console.log: ' + text);
     const toast = await this.toastController.create({
       message: text,
       duration: 1500,

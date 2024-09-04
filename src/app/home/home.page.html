@@ -14,13 +14,14 @@
   </ion-header>
 
   <div style="padding: 20px;">
-    <ion-button style="padding-bottom: 10px;" expand="block" [hidden] = "!isMovil" (click)="initialize()">Initialize UTIQ</ion-button>
-    <ion-button style="padding-bottom: 10px;" expand="block" [hidden] = "!isMovil" (click)="acceptConsent()">Accept Consent</ion-button>
-    <ion-button style="padding-bottom: 10px;" expand="block" [hidden] = "!isMovil" (click)="rejectConsent()">Reject Consent</ion-button>
-    <ion-button style="padding-bottom: 10px;" expand="block"
-      (click)="startService('523393b9b7aa92a534db512af83084506d89e965b95c36f982200e76afcb82cb')">Request IDs
+    <ion-button style="padding-bottom: 10px;" expand="block" (click)="initialize()">Initialize UTIQ</ion-button>
+    <ion-button style="padding-bottom: 10px;" expand="block" [disabled] = "!isIntialized" *ngIf = "isMovil" (click)="acceptConsent()">Accept Consent</ion-button>
+    <ion-button style="padding-bottom: 10px;" expand="block" [disabled] = "!isIntialized" *ngIf = "isMovil" (click)="rejectConsent()">Reject Consent</ion-button>
+    <ion-button style="padding-bottom: 10px;" expand="block" [disabled] = "!isIntialized"
+      (click)="startService()">
+      <span *ngIf = "!isLoading">Request IDs</span>
+      <ion-spinner *ngIf = "isLoading" name="dots"></ion-spinner>
     </ion-button>
-    <ion-button style="display: none" id="btnRefresh"></ion-button>
 
     <ion-list>
       <ion-item>
