@@ -3,7 +3,6 @@ import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonItem, IonLab
 import { UTIQ } from 'utiq-tech';
 import { environment } from '../../environments/environment';
 import { CommonModule } from '@angular/common';
-import { addIcons } from "ionicons";
 
 @Component({
   selector: 'app-home',
@@ -25,8 +24,10 @@ export class HomePage {
     this.isMovil = platform.is('android') || platform.is('ios');
 
     UTIQ.addListener('onFlowCompleted', (info: any) => {
-      this.isLoading = false;
-      console.log(`onFlowCompleted -> status: ` + Object.values(info)[0]);
+      let text = `onFlowCompleted -> status: ` + Object.values(info)[0];
+      console.log(text);
+      this.presentToast(text);
+      this.stopLoading();
     });
     UTIQ.addListener('onConsentUpdateFinished', (info: any) => {
       console.log(`onConsentUpdateFinished -> isConsentGranted: ` + Object.values(info)[0]);
@@ -46,9 +47,8 @@ export class HomePage {
       this.atid = Object.values(info)[0];
       this.mtid = Object.values(info)[1];
       console.log(`onIdsAvailable -> mtid: ` + this.mtid + ` , atid: ` + this.atid);
-      this.isLoading = false;
       this.presentToast('Success fetching IDs.');
-      this.cdr.detectChanges();
+      this.stopLoading();
     });
   };
 
@@ -59,16 +59,18 @@ export class HomePage {
     }
   }
   async acceptConsent() {
-    await UTIQ.acceptConsent();
+    UTIQ.acceptConsent();
+    this.presentToast('Consent Accepted.');
   }
   async rejectConsent() {
-    await UTIQ.rejectConsent();
+    this.atid = "";
+    this.mtid = "";
+    UTIQ.rejectConsent();
+    this.presentToast('Consent Rejected.');
   }
   async startService() {
-    if(this.mtid == null){
-      this.isLoading = true;
-      UTIQ.startService({ stubToken: this.stubToken });
-    }
+    this.isLoading = true;
+    UTIQ.startService({ stubToken: this.stubToken });
   }
   async presentToast(text: string) {
     const toast = await this.toastController.create({
@@ -77,5 +79,9 @@ export class HomePage {
       position: 'bottom',
     });
     await toast.present();
+  }
+  stopLoading(){
+    this.isLoading = false;
+    this.cdr.detectChanges();
   }
 }
