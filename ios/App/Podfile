@@ -15,7 +15,7 @@ def capacitor_pods
   pod 'CapacitorHaptics', :path => '../../node_modules/@capacitor/haptics'
   pod 'CapacitorKeyboard', :path => '../../node_modules/@capacitor/keyboard'
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
-  pod 'UtiqTech', :path => '../../node_modules/utiq-tech'
+  pod 'UtiqSdk', :path => '../../node_modules/utiq-sdk'
 end
 
 target 'App' do

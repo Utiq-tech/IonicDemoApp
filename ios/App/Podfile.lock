@@ -10,8 +10,8 @@ PODS:
     - Capacitor
   - CapacitorStatusBar (6.0.0):
     - Capacitor
-  - UTIQ (0.1.45)
-  - UtiqTech (0.0.3):
+  - UTIQ (0.1.56)
+  - UtiqSdk (0.0.5):
     - Capacitor
     - UTIQ
 
@@ -22,7 +22,7 @@ DEPENDENCIES:
   - "CapacitorHaptics (from `../../node_modules/@capacitor/haptics`)"
   - "CapacitorKeyboard (from `../../node_modules/@capacitor/keyboard`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
-  - UtiqTech (from `../../node_modules/utiq-tech`)
+  - UtiqSdk (from `../../node_modules/utiq-sdk`)
 
 SPEC REPOS:
   trunk:
@@ -41,8 +41,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/keyboard"
   CapacitorStatusBar:
     :path: "../../node_modules/@capacitor/status-bar"
-  UtiqTech:
-    :path: "../../node_modules/utiq-tech"
+  UtiqSdk:
+    :path: "../../node_modules/utiq-sdk"
 
 SPEC CHECKSUMS:
   Capacitor: 8941aba4364ba9d1b22188569001f2ce45cc2b00
@@ -51,9 +51,9 @@ SPEC CHECKSUMS:
   CapacitorHaptics: 9ebc9363f0e9b8eb4295088a0b474530acf1859b
   CapacitorKeyboard: 5f32a712adf41e07a61caafb82cf29fb6d8ba123
   CapacitorStatusBar: 2e4369f99166125435641b1908d05f561eaba6f6
-  UTIQ: 76e8ccc86db78c8920d196d0cf68e75f6d37ced3
-  UtiqTech: f03c5774f492399a7ab6c9b18100bd3b431fbba5
+  UTIQ: 82232a9adf071dd2bb5c023cc0338dafe96f55f6
+  UtiqSdk: 942882f28114f0da0ef75177a86eb016f3b22d3a
 
-PODFILE CHECKSUM: 28ba40937665d19fd4fbe4d1aed121f50c5517d8
+PODFILE CHECKSUM: 50479aae1fb4c2599f60fc609c01144ac3fb64bb
 
 COCOAPODS: 1.15.2

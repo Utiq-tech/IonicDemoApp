@@ -5,7 +5,6 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-cd myApp
 case $1 in
   "web")
     echo "Serving for web..."
@@ -26,7 +25,7 @@ case $1 in
     ;;
   "update")
     echo "Update plugin..."
-    npm install utiq-tech@latest
+    npm install utiq-sdk@latest
     ;;
   *)
     echo "Invalid option. Usage: $0 {web|android|ios|sync}"
