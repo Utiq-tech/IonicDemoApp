@@ -15,13 +15,13 @@
 
   <div style="padding: 20px;">
     <ion-button style="padding-bottom: 10px;" expand="block" (click)="initialize()">Initialize UTIQ</ion-button>
-    <ion-button style="padding-bottom: 10px;" expand="block" [disabled] = "!isIntialized" *ngIf = "isMovil" (click)="acceptConsent()">Accept Consent</ion-button>
-    <ion-button style="padding-bottom: 10px;" expand="block" [disabled] = "!isIntialized" *ngIf = "isMovil" (click)="rejectConsent()">Reject Consent</ion-button>
+    <ion-button style="padding-bottom: 10px;" expand="block" [disabled] = "!isIntialized" [hidden] = "!isMovil" (click)="checkMNOEligibility()">Check Eligibility</ion-button>
     <ion-button style="padding-bottom: 10px;" expand="block" [disabled] = "!isIntialized"
-      (click)="startService()">
+      (click)="fetchIdConnectData()">
       <span *ngIf = "!isLoading">Request IDs</span>
       <ion-spinner *ngIf = "isLoading" name="dots"></ion-spinner>
     </ion-button>
+    <ion-button style="padding-bottom: 10px;" expand="block" [disabled] = "!isIntialized" (click)="handleDataClear()">Clear Data</ion-button>
 
     <ion-list>
       <ion-item>

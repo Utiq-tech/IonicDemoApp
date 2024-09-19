@@ -1,8 +1,9 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonItem, IonLabel, IonList, ToastController, Platform, IonSpinner } from '@ionic/angular/standalone';
-import { UTIQ } from 'utiq-tech';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonItem, IonLabel, IonList, ToastController, Platform, IonSpinner, AlertController } from '@ionic/angular/standalone';
+import { UTIQ } from "utiq-sdk"
 import { environment } from '../../environments/environment';
 import { CommonModule } from '@angular/common';
+import { IdConnectData } from 'utiq-sdk';
 
 @Component({
   selector: 'app-home',
@@ -20,58 +21,89 @@ export class HomePage {
   isIntialized: boolean = false;
   stubToken: string = "523393b9b7aa92a534db512af83084506d89e965b95c36f982200e76afcb82cb";
 
-  constructor(private toastController: ToastController, private platform: Platform, private cdr: ChangeDetectorRef) {
+  constructor(private toastController: ToastController, private platform: Platform, private cdr: ChangeDetectorRef, private alertController: AlertController) {
     this.isMovil = platform.is('android') || platform.is('ios');
 
-    UTIQ.addListener('onFlowCompleted', (info: any) => {
-      let text = `onFlowCompleted -> status: ` + Object.values(info)[0];
+    UTIQ.addListener('onFlowCompleted', (value: { error: string }) => {
+      let errorText = '';
+      if (value != null && value.error != null) {
+        errorText = ` -> ${value.error}`;
+      }
+      let text = `onFlowCompleted${errorText}`;
       console.log(text);
       this.presentToast(text);
       this.stopLoading();
     });
-    UTIQ.addListener('onConsentUpdateFinished', (info: any) => {
-      console.log(`onConsentUpdateFinished -> isConsentGranted: ` + Object.values(info)[0]);
+    UTIQ.addListener('onConsentUpdateFinished', (value: { isConsentGranted: boolean }) => {
+      let text = `onConsentUpdateFinished -> status: ` + value.isConsentGranted;
+      console.log(text);
+      this.presentToast(text);
     });
-    UTIQ.addListener('onEligibilityChecked', (info: any) => {
-      console.log(`onEligibilityChecked -> isEligible: ` + Object.values(info)[0]);
+    UTIQ.addListener('onEligibilityChecked', (value: { isEligible: boolean }) => {
+      let text = `onEligibilityChecked -> isEligible: ` + value.isEligible;
+      console.log(text);
+      this.presentToast(text);
+      if (value.isEligible && this.isMovil) {
+        this.presentConsent();
+      }
     });
     UTIQ.addListener('onInitialised', () => {
       this.isIntialized = true;
       this.presentToast('Success Initialization.');
       console.log(`onInitialised`);
     });
-    UTIQ.addListener('onConsentManagerStatusChanged', (info: any) => {
-      console.log(`onConsentManagerStatusChanged -> status: ` + Object.values(info)[0]);
+    UTIQ.addListener('onConsentManagerStatusChanged', (value: { status: boolean }) => {
+      console.log(`onConsentManagerStatusChanged -> status: ` + value.status);
     });
-    UTIQ.addListener('onIdsAvailable', (info: any) => {
-      this.atid = Object.values(info)[0];
-      this.mtid = Object.values(info)[1];
-      console.log(`onIdsAvailable -> mtid: ` + this.mtid + ` , atid: ` + this.atid);
+    UTIQ.addListener('onIdsAvailable', ({ adTechPass, marTechPass }) => {
+      this.atid = adTechPass;
+      this.mtid = marTechPass;
+      console.log(`onIdsAvailable -> mtid: ` + marTechPass + ` , atid: ` + adTechPass);
       this.presentToast('Success fetching IDs.');
       this.stopLoading();
     });
   };
 
-  async initialize() {
-    if(!this.isIntialized){
+  initialize() {
+    if (!this.isIntialized) {
       const config = { sdkToken: 'R&Ai^v>TfqCz4Y^HH2?3uk8j', configParams: JSON.stringify(environment.utiq), sdkOptions: { enableLogging: true } };
       UTIQ.initialize(config);
     }
   }
-  async acceptConsent() {
-    UTIQ.acceptConsent();
-    this.presentToast('Consent Accepted.');
+
+  async checkMNOEligibility() {
+    await UTIQ.checkMNOEligibility({ stubToken: this.stubToken });
   }
-  async rejectConsent() {
-    this.atid = "";
-    this.mtid = "";
-    UTIQ.rejectConsent();
-    this.presentToast('Consent Rejected.');
+
+  async fetchIdConnectData() {
+    const idConnectData: IdConnectData = await UTIQ.idConnectData();
+    if (idConnectData) {
+      if (idConnectData.marTechPass != '') {
+        this.atid = idConnectData.adTechPass;
+        this.mtid = idConnectData.marTechPass;
+        this.stopLoading();
+        return;
+      }
+      if (!this.isMovil) {
+        this.isLoading = true;
+        const showConsent = await UTIQ.fetchIdConnectData({ stubToken: this.stubToken });
+        if(showConsent){
+          //window.Utiq.API.showConsentManager();
+        }
+      }
+      else {
+        const { status: isConsentAccepted } = await UTIQ.isConsentAccepted();
+        if (isConsentAccepted) {
+          this.isLoading = true;
+          UTIQ.fetchIdConnectData({ stubToken: this.stubToken });
+        }
+        else {
+          this.presentConsent(true);
+        }
+      }
+    }
   }
-  async startService() {
-    this.isLoading = true;
-    UTIQ.startService({ stubToken: this.stubToken });
-  }
+
   async presentToast(text: string) {
     const toast = await this.toastController.create({
       message: text,
@@ -80,8 +112,49 @@ export class HomePage {
     });
     await toast.present();
   }
-  stopLoading(){
+
+  stopLoading() {
     this.isLoading = false;
     this.cdr.detectChanges();
   }
+
+  handleDataClear() {
+    this.atid = "";
+    this.mtid = "";
+    UTIQ.handleDataClear();
+    this.presentToast('Utiq data was removed.');
+  }
+
+  async presentConsent(callFetchIds: boolean = false) {
+    const alert = await this.alertController.create({
+      header: 'UTIQ Consent',
+      message: 'Do you agree to UTIQ using your network data for marketing purposes?',
+      buttons: [
+        {
+          text: 'Reject',
+          role: 'cancel',
+          handler: () => {
+            this.atid = "";
+            this.mtid = "";
+            UTIQ.rejectConsent();
+            this.presentToast('Consent Rejected.');
+          }
+        },
+        {
+          text: 'Accept',
+          handler: () => {
+            UTIQ.acceptConsent();
+            this.presentToast('Consent Accepted.');
+            if(callFetchIds){
+              this.isLoading = true;
+              UTIQ.fetchIdConnectData({ stubToken: this.stubToken });
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
 }
+

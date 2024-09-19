@@ -9,7 +9,7 @@ case $1 in
   "web")
     echo "Serving for web..."
     open -a "Google Chrome" "http://utest1.work:8100/home"
-    ionic serve --host utest1.work --no-open
+    ionic serve --address utest1.work --no-open
     ;;
   "android")
     echo "Opening Android project..."
