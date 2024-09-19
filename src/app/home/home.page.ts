@@ -88,7 +88,7 @@ export class HomePage {
         this.isLoading = true;
         const showConsent = await UTIQ.fetchIdConnectData({ stubToken: this.stubToken });
         if(showConsent){
-          //window.Utiq.API.showConsentManager();
+          UTIQ.showConsentManager();
         }
       }
       else {
