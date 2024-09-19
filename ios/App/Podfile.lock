@@ -10,7 +10,7 @@ PODS:
     - Capacitor
   - CapacitorStatusBar (6.0.0):
     - Capacitor
-  - UTIQ (0.1.56)
+  - UTIQ (0.1.58)
   - UtiqSdk (0.0.7):
     - Capacitor
     - UTIQ
@@ -51,9 +51,9 @@ SPEC CHECKSUMS:
   CapacitorHaptics: 9ebc9363f0e9b8eb4295088a0b474530acf1859b
   CapacitorKeyboard: 5f32a712adf41e07a61caafb82cf29fb6d8ba123
   CapacitorStatusBar: 2e4369f99166125435641b1908d05f561eaba6f6
-  UTIQ: 82232a9adf071dd2bb5c023cc0338dafe96f55f6
+  UTIQ: d0f2c47bdb1bb5ab4653f571b0379078c7de8df2
   UtiqSdk: 9ddfdef5e5346393888d71c768e9f7f97b0d61cc
 
-PODFILE CHECKSUM: 50479aae1fb4c2599f60fc609c01144ac3fb64bb
+PODFILE CHECKSUM: 43a2ca85be1e793ba34c76fa6664294c878b32b8
 
 COCOAPODS: 1.15.2
